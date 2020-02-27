@@ -1,8 +1,11 @@
-$prefix = $wpdb->base_prefix;
-$attr = ['jet_post_types','jet_taxonomies'];
-$url = 'http://URL-To-JSON-File.com';
-$json = file_get_contents($url);
-$obj_ach = json_decode($json,true);
+<?php
+$prefix = $wpdb->base_prefix; //get the prefix of your database
+$attr = ['jet_post_types','jet_taxonomies']; //what are you intending to update within the database
+$url = 'http://URL-To-JSON-File.com'; //URL to where you JSON file exists (I used AWS Bucket)
+$json = file_get_contents($url); //PHP to read entire file into a string
+$obj_ach = json_decode($json,true); //Decode the JSON
+
+/** Update the DB with the NEW JSON pattern Future Method will be a Class**/
 function update_db($key,$obj){
 	global $wpdb;
 	global $attr;
@@ -16,10 +19,10 @@ function update_db($key,$obj){
 		$info = '';
 		$count = 0;
 		$slug = '';
-		foreach($obj as $e => $post_type){
+		foreach($obj as $e => $post_type){ //Iterate through the JSON file to Find the items we are wanting to update
 			$slug = $post_type['slug'];
 			$return = $wpdb->get_results("SELECT * FROM $db WHERE slug = '$slug'");
-			$count = $wpdb->num_rows;
+			$count = $wpdb->num_rows; //Is there actual Children to this row
 			$info = array('slug' => $post_type['slug'], 'labels' => $post_type['labels'], 'args' => $post_type['args'], 'meta_fields' => $post_type['meta_fields']);
 		}
 		if($count != 0){
@@ -30,7 +33,7 @@ function update_db($key,$obj){
 		}
 		
 	}
-	if($key == 'listings'){
+	if($key == 'listings'){ //This is currently under construction as listing are a bit more difficult to control within JetEngine
 		$documents = Elementor\Plugin::instance()->documents;
 
 	}
