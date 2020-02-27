@@ -1,0 +1,53 @@
+$prefix = $wpdb->base_prefix;
+$attr = ['jet_post_types','jet_taxonomies'];
+$url = 'http://URL-To-JSON-File.com';
+$json = file_get_contents($url);
+$obj_ach = json_decode($json,true);
+function update_db($key,$obj){
+	global $wpdb;
+	global $attr;
+	global $prefix;
+	/*if($key == 'post_types'){
+		$wpdb->update($table,())
+	}*/
+	if($key == 'post_types'){
+		$db = $prefix.$attr[0];
+		$return = '';
+		$info = '';
+		$count = 0;
+		$slug = '';
+		foreach($obj as $e => $post_type){
+			$slug = $post_type['slug'];
+			$return = $wpdb->get_results("SELECT * FROM $db WHERE slug = '$slug'");
+			$count = $wpdb->num_rows;
+			$info = array('slug' => $post_type['slug'], 'labels' => $post_type['labels'], 'args' => $post_type['args'], 'meta_fields' => $post_type['meta_fields']);
+		}
+		if($count != 0){
+			$where = array('slug' => $slug);
+			$updated = $wpdb->update($db, $info , $where);
+		} else {
+			$wpdb->insert( $db, $info, array());
+		}
+		
+	}
+	if($key == 'listings'){
+		$documents = Elementor\Plugin::instance()->documents;
+
+	}
+}
+
+function check_by_id(){
+	//print_r($id);
+	global $wpdb;
+	global $obj_ach;
+	
+	foreach($obj_ach as $key => $get){
+		$results = '';
+		update_db($key,$get);
+		
+	}
+}
+
+if(is_plugin_active('jet-engine/jet-engine.php')):
+	check_by_id();
+endif;
